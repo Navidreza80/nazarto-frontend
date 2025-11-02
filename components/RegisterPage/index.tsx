@@ -1,14 +1,38 @@
-// components/auth/register-form.tsx
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useRegister } from "@/hooks/useRegister";
 import { cn } from "@/lib/utils";
+import registerValidationSchema from "@/schemas/registerSchema";
+import { useFormik } from "formik";
+import { Loader } from "lucide-react";
 import Link from "next/link";
 
-export function RegisterForm({ className, ...props }: React.ComponentProps<"form">) {
+export function RegisterForm({
+  className,
+  ...props
+}: React.ComponentProps<"form">) {
+  const { mutate, isPending } = useRegister();
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      email: "",
+      password: "",
+    },
+    onSubmit: (values) => {
+      console.log(values);
+      mutate(values);
+    },
+    validationSchema: registerValidationSchema,
+  });
   return (
-    <form className={cn("flex flex-col gap-8 w-full", className)} {...props}>
-      {/* Heading */}
+    <form
+      onSubmit={formik.handleSubmit}
+      className={cn("flex flex-col gap-8 w-full", className)}
+      {...props}
+    >
       <div className="flex flex-col gap-2 text-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-primary">
           Join Nazarto
@@ -17,15 +41,14 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"form
           Create your account to start creating surveys
         </p>
       </div>
-
-      {/* Form Fields */}
       <div className="grid gap-6">
-        {/* Username */}
         <div className="grid gap-2">
           <Label htmlFor="username" className="font-semibold">
             Username
           </Label>
           <Input
+            value={formik.values.username}
+            onChange={formik.handleChange}
             id="username"
             name="username"
             type="text"
@@ -33,14 +56,17 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"form
             required
             className="h-12 rounded-xl px-4 border-border focus:border-primary focus:ring-2 focus:ring-primary/40 transition-all"
           />
+          {formik.errors.username && formik.touched.username ? (
+            <div className="text-red-500 text-sm">{formik.errors.username}</div>
+          ) : null}
         </div>
-
-        {/* Email */}
         <div className="grid gap-2">
           <Label htmlFor="email" className="font-semibold">
             Email
           </Label>
           <Input
+            value={formik.values.email}
+            onChange={formik.handleChange}
             id="email"
             name="email"
             type="email"
@@ -48,14 +74,18 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"form
             required
             className="h-12 rounded-xl px-4 border-border focus:border-primary focus:ring-2 focus:ring-primary/40 transition-all"
           />
+          {formik.errors.email && formik.touched.email ? (
+            <div className="text-red-500 text-sm">{formik.errors.email}</div>
+          ) : null}
         </div>
 
-        {/* Password */}
         <div className="grid gap-2">
           <Label htmlFor="password" className="font-semibold">
             Password
           </Label>
           <Input
+            value={formik.values.password}
+            onChange={formik.handleChange}
             id="password"
             name="password"
             type="password"
@@ -63,18 +93,18 @@ export function RegisterForm({ className, ...props }: React.ComponentProps<"form
             placeholder="Create a strong password"
             className="h-12 rounded-xl px-4 border-border focus:border-primary focus:ring-2 focus:ring-primary/40 transition-all"
           />
+          {formik.errors.password && formik.touched.password ? (
+            <div className="text-red-500 text-sm">{formik.errors.password}</div>
+          ) : null}
         </div>
-
-        {/* Submit Button */}
         <Button
           type="submit"
+          disabled={isPending}
           className="h-12 rounded-xl text-base font-semibold bg-primary/70 cursor-pointer text-white shadow-md hover:shadow-lg hover:brightness-110 transition-all"
         >
-          Create Account
+          {isPending ? <Loader className="animate-spin" /> : "Create Account"}
         </Button>
       </div>
-
-      {/* Login Link */}
       <div className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
