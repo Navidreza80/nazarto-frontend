@@ -8,7 +8,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 mt-20">
           {children}
         </main>
         <Footer />
