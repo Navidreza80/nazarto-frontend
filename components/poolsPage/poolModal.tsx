@@ -56,7 +56,7 @@ export function PollModal({ poll, children }: PollModalProps) {
             <DialogTitle className="text-2xl leading-tight">
               {poll.question}
             </DialogTitle>
-            
+
             {/* Poll Stats */}
             <div className="flex items-center gap-6 text-sm text-text-secondary mt-2">
               <div className="flex items-center gap-2">
@@ -77,35 +77,32 @@ export function PollModal({ poll, children }: PollModalProps) {
                 <BarChart3 className="h-5 w-5 text-primary" />
                 {hasVoted ? "Thank you for voting!" : "Select your answer:"}
               </h3>
-              
+
               {poll.options.map((option: any) => {
                 const percentage = calculatePercentage(option.votes.length);
                 const isSelected = selectedOption === option.id;
-                
+
                 return (
                   <div
                     key={option.id}
-                    className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                      isSelected
+                    className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${isSelected
                         ? "border-primary bg-primary/5 shadow-md"
                         : "border-border hover:border-primary/30 hover:bg-primary/5"
-                    } ${hasVoted ? "cursor-default" : ""}`}
+                      } ${hasVoted ? "cursor-default" : ""}`}
                     onClick={() => !hasVoted && setSelectedOption(option.id)}
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
                         {!hasVoted ? (
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-                            isSelected 
-                              ? "border-primary bg-primary shadow-sm" 
+                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${isSelected
+                              ? "border-primary bg-primary shadow-sm"
                               : "border-border hover:border-primary/60"
-                          }`}>
+                            }`}>
                             {isSelected && <div className="w-3 h-3 rounded-full bg-white" />}
                           </div>
                         ) : (
-                          <CheckCircle className={`h-6 w-6 ${
-                            isSelected ? "text-primary" : "text-text-secondary"
-                          }`} />
+                          <CheckCircle className={`h-6 w-6 ${isSelected ? "text-primary" : "text-text-secondary"
+                            }`} />
                         )}
                         <span className="font-medium text-foreground text-base">{option.text}</span>
                       </div>
@@ -113,11 +110,11 @@ export function PollModal({ poll, children }: PollModalProps) {
                         {option.votes.length} votes ({Math.round(percentage)}%)
                       </span>
                     </div>
-                    
+
                     {/* Progress Bar */}
                     <div className="w-full bg-secondary/20 rounded-full h-3 overflow-hidden">
-                      <div 
-                        className="bg-gradient-to-r from-primary to-secondary h-3 rounded-full transition-all duration-1000 ease-out"
+                      <div
+                        className="bg-primary/60 h-3 rounded-full transition-all duration-1000 ease-out"
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -132,7 +129,7 @@ export function PollModal({ poll, children }: PollModalProps) {
                 <Button
                   onClick={handleVote}
                   disabled={selectedOption === null}
-                  className="w-full py-4 text-lg font-semibold bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-4 text-lg cursor-pointer font-semibold bg-primary/60 hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Submit Your Vote
                 </Button>
