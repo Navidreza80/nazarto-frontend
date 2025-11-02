@@ -9,7 +9,7 @@ import { Plus, Trash2, MessageCircle } from "lucide-react";
 
 export function CreatePollForm() {
   const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", ""]); // Start with 2 empty options
+  const [options, setOptions] = useState(["", ""]); 
 
   const addOption = () => {
     setOptions([...options, ""]);
@@ -30,7 +30,6 @@ export function CreatePollForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Submit poll data
     console.log({
       question,
       options: options.filter(opt => opt.trim() !== "")
@@ -40,7 +39,6 @@ export function CreatePollForm() {
   return (
     <Card className="min-w-2xl py-6">
       <CardHeader className="text-center flex items-center justify-center gap-2">
-          <MessageCircle className="h-6 w-6 text-primary" />
           <CardTitle className="text-2xl font-bold">Create New Survey</CardTitle>
       </CardHeader>
 
