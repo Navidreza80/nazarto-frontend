@@ -30,16 +30,13 @@ export function CreatePollForm() {
     setOptions(newOptions);
   };
 
-  // در کامپوننت CreatePollForm
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log('🖱️ FORM STEP 1: Submit handler called');
 
     const validOptions = options.filter(opt => opt.trim() !== "");
 
     if (validOptions.length < 2) {
-      console.log('❌ FORM STEP 2: Validation failed - not enough options');
       toast.error("Please add at least 2 options");
       return;
     }
