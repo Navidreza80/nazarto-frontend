@@ -1,5 +1,4 @@
-import { CreatePollForm } from "@/components/Dashboard Admin";
-
+import { CreatePollForm } from "@/components/PollsPage/CreatePoll";
 
 export default function CreatePollPage() {
   return (

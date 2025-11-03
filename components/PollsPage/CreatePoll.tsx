@@ -1,19 +1,19 @@
-/* eslint-disable */
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Loader2 } from "lucide-react";
 import { useCreatePoll } from "@/hooks/useCreatePolls";
+import { Loader, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export function CreatePollForm() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState(["", ""]);
   const { mutate: createPoll, isPending } = useCreatePoll();
+  console.log(isPending);
 
   const addOption = () => {
     setOptions([...options, ""]);
@@ -34,10 +34,9 @@ export function CreatePollForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Filter out empty options
-    const validOptions = options.filter(opt => opt.trim() !== "");
-    
+
+    const validOptions = options.filter((opt) => opt.trim() !== "");
+
     if (validOptions.length < 2) {
       toast.error("Please add at least 2 options");
       return;
@@ -47,17 +46,9 @@ export function CreatePollForm() {
       toast.error("Please enter a question");
       return;
     }
-
-    // Log for debugging
-    console.log('🎯 Submitting poll data:', {
-      question: question.trim(),
-      options: validOptions
-    });
-
-    // Call the API
     createPoll({
       question: question.trim(),
-      options: validOptions
+      options: validOptions,
     });
   };
 
@@ -69,7 +60,6 @@ export function CreatePollForm() {
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Question Input */}
           <div className="space-y-3">
             <Label htmlFor="question" className="text-base font-semibold">
               Survey Question *
@@ -85,12 +75,11 @@ export function CreatePollForm() {
             />
           </div>
 
-          {/* Options Section */}
           <div className="space-y-4">
             <Label className="text-base font-semibold">
               Options * (Minimum 2)
             </Label>
-            
+
             <div className="space-y-3 max-h-[18vh] overflow-y-auto">
               {options.map((option, index) => (
                 <div key={index} className="flex items-center gap-3 group">
@@ -102,8 +91,7 @@ export function CreatePollForm() {
                     required
                     disabled={isPending}
                   />
-                  
-                  {/* Remove Button - Only show if more than 2 options */}
+
                   {options.length > 2 && (
                     <Button
                       type="button"
@@ -120,7 +108,6 @@ export function CreatePollForm() {
               ))}
             </div>
 
-            {/* Add Option Button */}
             <Button
               type="button"
               onClick={addOption}
@@ -133,7 +120,6 @@ export function CreatePollForm() {
             </Button>
           </div>
 
-          {/* Submit Button */}
           <Button
             type="submit"
             className="w-full bg-primary/70 cursor-pointer to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
@@ -142,8 +128,7 @@ export function CreatePollForm() {
           >
             {isPending ? (
               <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating Survey...
+                <Loader className="h-4 w-4 mr-2 animate-spin" />
               </>
             ) : (
               "Create Survey"
