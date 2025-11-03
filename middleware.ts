@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getServerCookie } from "./helper/server-cookie";
@@ -5,7 +7,7 @@ import { verifyToken } from "./lib/verifyToken";
 
 export async function middleware(req: NextRequest) {
   const token = await getServerCookie("access_token");
-  const verified = await verifyToken(token);
+  const verified: any = await verifyToken(token);
 
   const { pathname } = req.nextUrl;
 
@@ -15,7 +17,12 @@ export async function middleware(req: NextRequest) {
   if (!verified && pathname == "/") {
     return NextResponse.redirect(new URL("/login", req.url));
   }
-  if (!verified && pathname.startsWith("/dashboard")) {
+  if (
+    verified &&
+    !verified &&
+    verified.role !== "ADMIN" &&
+    pathname.startsWith("/dashboard")
+  ) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
