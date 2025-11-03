@@ -2,7 +2,6 @@
 "use client";
 
 import { createVote, VotePayload } from "@/services/api/polls/createVote";
-import { PollsResponse } from "@/services/api/polls/getAllPolls";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
