@@ -10,7 +10,6 @@ export function Header() {
     <header className="border-b border-border bg-surface mb-4">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">N</span>
@@ -18,7 +17,7 @@ export function Header() {
             <span className="text-xl font-bold text-foreground">Nazarto</span>
           </Link>
 
-          {/* Navigation */}
+
           <nav className="flex items-center gap-6">
             <Link 
               href="/" 

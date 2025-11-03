@@ -40,7 +40,6 @@ const PollDetail = ({ poll }: { poll: PollsResponse }) => {
         <DialogTitle></DialogTitle>
 
         <div className="p-6 space-y-6">
-          {/* Main Question */}
           <div className="bg-surface/50 rounded-xl p-4 border border-border">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -51,7 +50,6 @@ const PollDetail = ({ poll }: { poll: PollsResponse }) => {
             </p>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-surface/50 rounded-xl p-4 border border-border text-center">
               <div className="flex justify-center mb-2">
@@ -95,8 +93,6 @@ const PollDetail = ({ poll }: { poll: PollsResponse }) => {
               <p className="text-text-secondary text-sm">Created</p>
             </div>
           </div>
-
-          {/* Options List */}
           {poll.options.length > 0 && (
             <div className="bg-surface/50 rounded-xl p-4 border border-border">
               <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
@@ -146,8 +142,6 @@ const PollDetail = ({ poll }: { poll: PollsResponse }) => {
               </div>
             </div>
           )}
-
-          {/* Additional Info */}
           <div className="bg-surface/50 rounded-xl p-4 border border-border">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>

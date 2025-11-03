@@ -75,8 +75,6 @@ export default function PollModal({ pollId, children }: PollModalProps) {
           <DialogTitle className="text-2xl leading-tight">
             {poll?.question}
           </DialogTitle>
-
-          {/* Poll Stats */}
           <div className="flex items-center gap-6 text-sm text-text-secondary mt-2">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4" />
@@ -92,7 +90,7 @@ export default function PollModal({ pollId, children }: PollModalProps) {
         </DialogHeader>
 
         <div className="px-8 py-6 space-y-6">
-          {/* Voting Options */}
+
           <div className="space-y-4">
             <h3 className="font-semibold text-foreground text-lg flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-primary" />
@@ -146,7 +144,6 @@ export default function PollModal({ pollId, children }: PollModalProps) {
                     </span>
                   </div>
 
-                  {/* Progress Bar */}
                   <div className="w-full bg-secondary/20 rounded-full h-3 overflow-hidden">
                     <div
                       className="bg-primary/60 h-3 rounded-full transition-all duration-1000 ease-out"
@@ -158,7 +155,6 @@ export default function PollModal({ pollId, children }: PollModalProps) {
             })}
           </div>
 
-          {/* Action Buttons */}
           <div className="space-y-3">
             {!hasVoted && poll?.isActive && (
               <Button
