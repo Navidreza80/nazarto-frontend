@@ -1,9 +1,9 @@
 /* eslint-disable */
 import { NextRequest, NextResponse } from "next/server";
-import { getServerCookie } from "./helper/server-cookie";
 import { verifyToken } from "./lib/verifyToken";
+import { getServerCookie } from "./helper/server-cookie";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getServerCookie("access_token");
   const verified: any = await verifyToken(token);
   const { pathname } = req.nextUrl;
@@ -26,3 +26,7 @@ export async function middleware(req: NextRequest) {
 
   return NextResponse.next();
 }
+
+export const config = {
+  matcher: ["/", "/login", "/register", "/dashboard/:path*"],
+};

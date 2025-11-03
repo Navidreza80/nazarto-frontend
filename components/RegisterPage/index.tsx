@@ -11,9 +11,9 @@ import { useFormik } from "formik";
 import { Loader } from "lucide-react";
 import Link from "next/link";
 
-const fp = await FingerprintJS.load();
-const result = await fp.get();
-const fingerprint = result.visitorId;
+const fp = typeof window !== undefined && (await FingerprintJS.load());
+const result = fp && (await fp.get());
+const fingerprint = result && result.visitorId;
 
 export function RegisterForm({
   className,
@@ -27,7 +27,9 @@ export function RegisterForm({
       password: "",
     },
     onSubmit: (values) => {
-      mutate({ ...values, fingerprint });
+      if (fingerprint) {
+        mutate({ ...values, fingerprint });
+      }
     },
     validationSchema: registerValidationSchema,
   });
