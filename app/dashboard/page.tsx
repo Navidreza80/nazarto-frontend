@@ -18,7 +18,7 @@ export default async function AdminPollsPage() {
   const polls = await getAllPolls();
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto py-8">
       <div className="hidden md:flex overflow-x-auto rounded-lg border border-border">
         <table className="w-full">
           <thead>
