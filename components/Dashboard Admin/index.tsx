@@ -6,10 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Trash2, MessageCircle } from "lucide-react";
+import { createPoll } from "@/services/api/polls/create-poll";
+import toast from "react-hot-toast";
 
 export function CreatePollForm() {
   const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", ""]); 
+  const [options, setOptions] = useState(["", ""]);
 
   const addOption = () => {
     setOptions([...options, ""]);
@@ -28,18 +30,34 @@ export function CreatePollForm() {
     setOptions(newOptions);
   };
 
+  // در کامپوننت CreatePollForm
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      question,
-      options: options.filter(opt => opt.trim() !== "")
-    });
+
+    console.log('🖱️ FORM STEP 1: Submit handler called');
+
+    const validOptions = options.filter(opt => opt.trim() !== "");
+
+    if (validOptions.length < 2) {
+      console.log('❌ FORM STEP 2: Validation failed - not enough options');
+      toast.error("Please add at least 2 options");
+      return;
+    }
+
+    const submitData = {
+      question: question.trim(),
+      options: validOptions
+    };
+
+    console.log('📤 FORM STEP 3: Calling mutate with data:', submitData);
+
+    createPoll(submitData);
   };
 
   return (
     <Card className="min-w-2xl py-6">
       <CardHeader className="text-center flex items-center justify-center gap-2">
-          <CardTitle className="text-2xl font-bold">Create New Survey</CardTitle>
+        <CardTitle className="text-2xl font-bold">Create New Survey</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -64,7 +82,7 @@ export function CreatePollForm() {
             <Label className="text-base font-semibold">
               Options * (Minimum 2)
             </Label>
-            
+
             <div className="space-y-3 max-h-[18vh] overflow-y-auto">
               {options.map((option, index) => (
                 <div key={index} className="flex items-center gap-3 group">
@@ -75,7 +93,7 @@ export function CreatePollForm() {
                     className="h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-primary/40 flex-1"
                     required
                   />
-                  
+
                   {/* Remove Button - Only show if more than 2 options */}
                   {options.length > 2 && (
                     <Button
