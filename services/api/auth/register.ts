@@ -1,9 +1,11 @@
+import { setClientCookie } from "@/helper/client-cookie";
 import { setServerCookie } from "@/helper/server-cookie";
 
 export type RegisterPayload = {
   username: string;
   email: string;
   password: string;
+  fingerprint: string;
 };
 
 export type RegisterResponse = {
@@ -24,8 +26,8 @@ export const registerUser = async (
     throw new Error(error.message || "Registration failed");
   }
   const result = await response.json();
+  setClientCookie("access_token", result.access_token, 15);
   await setServerCookie("access_token", result.access_token);
-  setServerCookie("access_token", result.access_token);
 
   return result;
 };

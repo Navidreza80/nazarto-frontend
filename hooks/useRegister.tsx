@@ -1,5 +1,5 @@
 /* eslint-disable */
-"use client"
+"use client";
 
 import { RegisterPayload, registerUser } from "@/services/api/auth/register";
 import { useMutation } from "@tanstack/react-query";

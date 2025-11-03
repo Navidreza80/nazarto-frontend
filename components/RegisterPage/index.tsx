@@ -6,9 +6,14 @@ import { Label } from "@/components/ui/label";
 import { useRegister } from "@/hooks/useRegister";
 import { cn } from "@/lib/utils";
 import registerValidationSchema from "@/schemas/registerSchema";
+import FingerprintJS from "@fingerprintjs/fingerprintjs";
 import { useFormik } from "formik";
 import { Loader } from "lucide-react";
 import Link from "next/link";
+
+const fp = await FingerprintJS.load();
+const result = await fp.get();
+const fingerprint = result.visitorId;
 
 export function RegisterForm({
   className,
@@ -22,8 +27,7 @@ export function RegisterForm({
       password: "",
     },
     onSubmit: (values) => {
-      console.log(values);
-      mutate(values);
+      mutate({ ...values, fingerprint });
     },
     validationSchema: registerValidationSchema,
   });
