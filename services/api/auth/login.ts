@@ -1,3 +1,4 @@
+import { setClientCookie } from "@/helper/client-cookie";
 import { setServerCookie } from "@/helper/server-cookie";
 
 export type LoginPayload = {
@@ -23,8 +24,8 @@ export const loginUser = async (
     throw new Error(error.message || "Login failed");
   }
   const result = await response.json();
+  setClientCookie("access_token", result.access_token, 15);
   await setServerCookie("access_token", result.access_token);
-  setServerCookie("access_token", result.access_token);
 
   return result;
 };
