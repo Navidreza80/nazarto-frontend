@@ -3,7 +3,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAllPolls } from "@/services/api/polls/getAllPolls";
-import { BarChart3, Calendar, Clock, Users } from "lucide-react";
+import { Calendar, Clock, Users } from "lucide-react";
 import dynamic from "next/dynamic";
 const PollModal = dynamic(() => import("@/components/PollsPage/PollModal"), {
   ssr: true,
@@ -20,8 +20,8 @@ function formatDate(dateString: string) {
 export default async function PollsPage() {
   const polls = await getAllPolls();
   return (
-    <div className="mx-auto px-4 py-8 flex justify-center items-start">
-      <div className="flex flex-col items-center justify-center lg:w-2xl md:w-xl w-lg">
+    <>
+      <div className="flex flex-col items-center justify-center lg:w-2xl md:w-xl w-lg mx-auto">
         {polls.map((poll) => {
           return (
             <Card
@@ -107,6 +107,6 @@ export default async function PollsPage() {
           </p>
         </div>
       )}
-    </div>
+    </>
   );
 }
