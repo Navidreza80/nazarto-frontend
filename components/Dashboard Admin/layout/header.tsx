@@ -7,7 +7,7 @@ export function Header() {
   const pathname = usePathname();
 
   return (
-    <header className="border-b border-border bg-surface">
+    <header className="border-b border-border bg-surface mb-4">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

@@ -5,10 +5,13 @@ import { deletePoll } from "@/services/api/polls/deletePoll";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-export const useDeletePoll = () => {
+export const useDeletePoll = (onSuccess: () => void) => {
   const mutation = useMutation((id: number) => deletePoll(id), {
     onSuccess: () => {
       toast.success("Poll deleted successful!");
+      if (onSuccess) {
+        onSuccess();
+      }
     },
     onError: (error: any) => {
       toast.error(error?.message || "Delete failed");
