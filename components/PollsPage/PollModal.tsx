@@ -10,7 +10,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useVote } from "@/hooks/useVote";
-import { PollsResponse } from "@/services/api/polls/getAllPolls";
 import { getPollById } from "@/services/api/polls/getPollById";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
