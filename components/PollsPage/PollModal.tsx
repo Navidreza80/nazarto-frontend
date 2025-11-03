@@ -1,156 +1,193 @@
 /* eslint-disable */
 "use client";
 
-import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Trash2, Loader2 } from "lucide-react";
-import { useCreatePoll } from "@/hooks/useCreatePolls";
-import toast from "react-hot-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useVote } from "@/hooks/useVote";
+import { getPollById } from "@/services/api/polls/getPollById";
+import { DialogTrigger } from "@radix-ui/react-dialog";
+import { useQuery } from "@tanstack/react-query";
+import {
+  BarChart3,
+  Calendar,
+  CheckCircle,
+  Clock,
+  Loader,
+  Users,
+} from "lucide-react";
+import { useState } from "react";
 
-export function CreatePollForm() {
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState(["", ""]);
-  const { mutate: createPoll, isPending } = useCreatePoll();
+interface PollModalProps {
+  pollId: number;
+  children: React.ReactNode;
+}
 
-  const addOption = () => {
-    setOptions([...options, ""]);
-  };
+export default function PollModal({ pollId, children }: PollModalProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
-  const removeOption = (index: number) => {
-    if (options.length > 2) {
-      const newOptions = options.filter((_, i) => i !== index);
-      setOptions(newOptions);
+  const {
+    data: poll,
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryFn: () => getPollById(pollId),
+    queryKey: ["GET_POLL_BY_ID", pollId, isOpen],
+    enabled: isOpen,
+  });
+
+  const { mutate, isPending } = useVote(refetch);
+  const [selectedOption, setSelectedOption] = useState<number | null>(null);
+
+  const totalVotes = poll?.totalVotes || 0;
+  const hasVoted = poll?.userVote !== null;
+  const votedOption = poll?.userVote?.optionId;
+
+  const handleVote = () => {
+    if (selectedOption !== null && poll) {
+      mutate({ pollId: poll.id, optionId: selectedOption });
     }
   };
 
-  const updateOption = (index: number, value: string) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Filter out empty options
-    const validOptions = options.filter(opt => opt.trim() !== "");
-    
-    if (validOptions.length < 2) {
-      toast.error("Please add at least 2 options");
-      return;
-    }
-
-    if (!question.trim()) {
-      toast.error("Please enter a question");
-      return;
-    }
-
-    // Log for debugging
-    console.log('🎯 Submitting poll data:', {
-      question: question.trim(),
-      options: validOptions
-    });
-
-    // Call the API
-    createPoll({
-      question: question.trim(),
-      options: validOptions
-    });
+  const calculatePercentage = (votes: number) => {
+    return totalVotes > 0 ? (votes / totalVotes) * 100 : 0;
   };
 
   return (
-    <Card className="min-w-2xl py-6">
-      <CardHeader className="text-center flex items-center justify-center gap-2">
-        <CardTitle className="text-2xl font-bold">Create New Survey</CardTitle>
-      </CardHeader>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <div className="cursor-pointer">{children}</div>
+      </DialogTrigger>
 
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Question Input */}
-          <div className="space-y-3">
-            <Label htmlFor="question" className="text-base font-semibold">
-              Survey Question *
-            </Label>
-            <Input
-              id="question"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Ask your question here..."
-              className="h-12 text-lg rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-primary/40"
-              required
-              disabled={isPending}
-            />
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto p-0">
+        {isLoading && <Loader className="animate-spin" />}
+        <DialogHeader className="bg-gradient-to-r from-primary/5 to-secondary/5">
+          <div className="flex items-center gap-3 mb-4">
+            <Badge variant={poll?.isActive ? "default" : "outline"}>
+              {poll?.isActive ? "Active" : "Closed"}
+            </Badge>
           </div>
+          <DialogTitle className="text-2xl leading-tight">
+            {poll?.question}
+          </DialogTitle>
 
-          {/* Options Section */}
-          <div className="space-y-4">
-            <Label className="text-base font-semibold">
-              Options * (Minimum 2)
-            </Label>
-            
-            <div className="space-y-3 max-h-[18vh] overflow-y-auto">
-              {options.map((option, index) => (
-                <div key={index} className="flex items-center gap-3 group">
-                  <Input
-                    value={option}
-                    onChange={(e) => updateOption(index, e.target.value)}
-                    placeholder={`Option ${index + 1}`}
-                    className="h-11 rounded-xl border-border focus:border-primary focus:ring-2 focus:ring-primary/40 flex-1"
-                    required
-                    disabled={isPending}
-                  />
-                  
-                  {/* Remove Button - Only show if more than 2 options */}
-                  {options.length > 2 && (
-                    <Button
-                      type="button"
-                      onClick={() => removeOption(index)}
-                      variant="outline"
-                      size="sm"
-                      className="h-9 w-9 p-0 border-border text-text-secondary hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all duration-200 opacity-0 group-hover:opacity-100 disabled:opacity-30"
-                      disabled={isPending}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              ))}
+          {/* Poll Stats */}
+          <div className="flex items-center gap-6 text-sm text-text-secondary mt-2">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4" />
+              <span>{totalVotes} total votes</span>
             </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              <span>
+                Created {new Date(poll?.createdAt || "").toLocaleDateString()}
+              </span>
+            </div>
+          </div>
+        </DialogHeader>
 
-            {/* Add Option Button */}
-            <Button
-              type="button"
-              onClick={addOption}
-              variant="outline"
-              className="w-full cursor-pointer border-border hover:border-primary hover:bg-primary/5 text-text-secondary hover:text-primary transition-all duration-200 py-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={isPending}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Option
-            </Button>
+        <div className="px-8 py-6 space-y-6">
+          {/* Voting Options */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-foreground text-lg flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              {hasVoted ? "Thank you for voting!" : "Select your answer:"}
+            </h3>
+
+            {poll?.options.map((option: any) => {
+              const percentage = calculatePercentage(option.totalVotes);
+              const isSelected = selectedOption === option.id;
+
+              return (
+                <div
+                  key={option.id}
+                  className={`p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                    isSelected
+                      ? "border-primary bg-primary/5 shadow-md"
+                      : "border-border hover:border-primary/30 hover:bg-primary/5"
+                  } ${hasVoted ? "cursor-default" : ""}`}
+                  onClick={() => !hasVoted && setSelectedOption(option.id)}
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      {!hasVoted ? (
+                        <div
+                          className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
+                            isSelected
+                              ? "border-primary bg-primary shadow-sm"
+                              : "border-border hover:border-primary/60"
+                          }`}
+                        >
+                          {isSelected && (
+                            <div className="w-3 h-3 rounded-full bg-white" />
+                          )}
+                        </div>
+                      ) : (
+                        <CheckCircle
+                          className={`h-6 w-6 ${
+                            isSelected || votedOption === option.id
+                              ? "text-primary"
+                              : "text-text-secondary"
+                          }`}
+                        />
+                      )}
+                      <span className="font-medium text-foreground text-base">
+                        {option.text}
+                      </span>
+                    </div>
+                    <span className="text-text-secondary text-sm font-medium bg-background px-2 py-1 rounded-lg">
+                      {option.totalVotes} votes ({Math.round(percentage)}
+                      %)
+                    </span>
+                  </div>
+
+                  {/* Progress Bar */}
+                  <div className="w-full bg-secondary/20 rounded-full h-3 overflow-hidden">
+                    <div
+                      className="bg-primary/60 h-3 rounded-full transition-all duration-1000 ease-out"
+                      style={{ width: `${percentage}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
-          {/* Submit Button */}
-          <Button
-            type="submit"
-            className="w-full bg-primary/70 cursor-pointer to-secondary hover:from-primary/90 hover:to-secondary/90 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed"
-            size="lg"
-            disabled={isPending}
-          >
-            {isPending ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Creating Survey...
-              </>
-            ) : (
-              "Create Survey"
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            {!hasVoted && poll?.isActive && (
+              <Button
+                onClick={handleVote}
+                disabled={isPending}
+                className="w-full py-4 text-lg cursor-pointer font-semibold bg-primary/60 hover:from-primary/90 hover:to-secondary/90 shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isPending ? (
+                  <Loader className="animate-spin" />
+                ) : (
+                  "Submit Your Vote"
+                )}
+              </Button>
             )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+
+            {!poll?.isActive && (
+              <div className="text-center p-6 bg-gradient-to-r from-yellow-500/10 to-yellow-600/10 border border-yellow-500/20 rounded-2xl">
+                <Clock className="h-12 w-12 text-yellow-500 mx-auto mb-3" />
+                <p className="text-yellow-600 font-semibold text-lg">
+                  This survey is closed for voting
+                </p>
+                <p className="text-yellow-500/70 text-sm mt-1">
+                  You can view the results above
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

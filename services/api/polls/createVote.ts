@@ -1,6 +1,5 @@
 import { getServerCookie } from "@/helper/server-cookie";
 import { PollsResponse } from "./getAllPolls";
-import toast from "react-hot-toast";
 
 export type VotePayload = {
   pollId: number;
