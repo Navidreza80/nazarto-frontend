@@ -14,12 +14,10 @@ export const useCreatePoll = () => {
       return createPoll(payload);
     },
     onSuccess: (data) => {
-      console.log('✅ HOOK: Survey created successfully:', data);
       toast.success("Survey created successfully!");
       router.push("/polls");
     },
     onError: (error: any) => {
-      console.log('❌ HOOK: Create poll error:', error);
       toast.error(error?.message || "Failed to create survey");
     },
   });
