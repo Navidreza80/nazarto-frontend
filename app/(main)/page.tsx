@@ -21,7 +21,7 @@ export default async function PollsPage() {
   const polls = await getAllPolls();
   return (
     <>
-      <div className="flex flex-col items-center justify-center lg:w-2xl md:w-xl w-lg mx-auto">
+      <div className="flex flex-col items-center justify-center lg:w-2xl md:w-xl w-lg mx-auto space-y-4">
         {polls.map((poll) => {
           return (
             <Card
