@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 
-import { editPoll } from "@/services/api/polls/editPoll";
+import { editPoll } from "@/services/api/polls/togglePollActive";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 

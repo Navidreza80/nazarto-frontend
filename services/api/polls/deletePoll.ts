@@ -2,13 +2,13 @@ import { getServerCookie } from "@/helper/server-cookie";
 import { PollsResponse } from "./getAllPolls";
 
 export type DeletePollResponse = {
-  id: 4;
-  question: "are you designer";
-  createdAt: "2025-11-03T05:08:41.610Z";
-  expiresAt: null;
-  isActive: true;
-  createdById: 9;
-  totalVotes: 0;
+  id: number,
+  question: string,
+  createdAt: Date,
+  expiresAt: Date,
+  isActive: boolean;
+  createdById: number;
+  totalVotes: number;
 };
 
 export const deletePoll = async (id: number): Promise<PollsResponse> => {

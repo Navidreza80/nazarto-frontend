@@ -1,7 +1,7 @@
 /* eslint-disable */
 "use client";
 
-import { deletePoll } from "@/services/api/polls/deleteEdit";
+import { deletePoll } from "@/services/api/polls/deletePoll";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 

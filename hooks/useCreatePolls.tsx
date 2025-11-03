@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 
 export const useCreatePoll = () => {
   const router = useRouter();
+
   const mutation = useMutation(
     (payload: CreatePollPayload) => createPoll(payload),
     {

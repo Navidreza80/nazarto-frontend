@@ -1,10 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { getAllPolls } from "@/services/api/polls/getAllPolls";
-import { BarChart3, Calendar, Clock, Users, Edit, Trash2, Plus, Eye, MoreVertical } from "lucide-react";
+import { deletePoll } from "@/services/api/polls/deletePoll";
+import { togglePollActive } from "@/services/api/polls/togglePollActive";
+import { BarChart3, Calendar, Clock, Users, Edit, Trash2, Plus, Eye, MoreVertical, Play, Pause } from "lucide-react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -22,6 +26,30 @@ function formatDateTime(dateString: string) {
         hour: '2-digit',
         minute: '2-digit'
     });
+}
+
+// Server Action for Delete
+async function handleDeletePoll(id: number) {
+    "use server";
+    try {
+        await deletePoll(id);
+        redirect("/dashboard");
+    } catch (error) {
+        console.error("Delete failed:", error);
+        throw error;
+    }
+}
+
+// Server Action for Toggle Active/Inactive
+async function handleTogglePollActive(id: number, currentStatus: boolean) {
+    "use server";
+    try {
+        await togglePollActive(id, !currentStatus);
+        redirect("/dashboard");
+    } catch (error) {
+        console.error("Toggle active failed:", error);
+        throw error;
+    }
 }
 
 export default async function AdminPollsPage() {
@@ -114,30 +142,95 @@ export default async function AdminPollsPage() {
                                         </PopoverTrigger>
                                         <PopoverContent className="w-48 p-2" align="end">
                                             <div className="space-y-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-primary/10 hover:text-primary"
-                                                >
-                                                    <Eye className="h-4 w-4 mr-2" />
-                                                    View
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-secondary/10 hover:text-secondary"
-                                                >
-                                                    <Edit className="h-4 w-4 mr-2" />
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-red-500/10 hover:text-red-500 text-red-600"
-                                                >
-                                                    <Trash2 className="h-4 w-4 mr-2" />
-                                                    Delete
-                                                </Button>
+                                                {/* View Details with Dialog */}
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="w-full justify-start hover:bg-primary/10 hover:text-primary"
+                                                        >
+                                                            <Eye className="h-4 w-4 mr-2" />
+                                                            View Details
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="max-w-2xl p-5">
+                                                        <div className="space-y-4">
+                                                            <div>
+                                                                <h3 className="font-semibold text-foreground mb-2">Question:</h3>
+                                                                <p className="text-foreground">{poll.question}</p>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Status:</h4>
+                                                                    <Badge variant={poll.isActive ? "default" : "outline"}>
+                                                                        {poll.isActive ? 'Active' : 'Closed'}
+                                                                    </Badge>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Total Votes:</h4>
+                                                                    <p className="text-foreground">{poll.totalVotes}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Options:</h4>
+                                                                    <p className="text-foreground">{poll.options.length}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Created:</h4>
+                                                                    <p className="text-foreground">{formatDateTime(poll.createdAt)}</p>
+                                                                </div>
+                                                            </div>
+                                                            {poll.options.length > 0 && (
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-2">Options:</h4>
+                                                                    <div className="space-y-2">
+                                                                        {poll.options.map((option, index) => (
+                                                                            <div key={option.id} className="flex items-center justify-between p-2 bg-surface rounded-lg">
+                                                                                <span className="text-foreground">{option.text}</span>
+                                                                                <span className="text-text-secondary text-sm">{option.votes?.length || 0} votes</span>
+                                                                            </div>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+
+                                                {/* Toggle Active/Inactive */}
+                                                <form action={handleTogglePollActive.bind(null, poll.id, poll.isActive)}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        type="submit"
+                                                        className={`w-full justify-start ${poll.isActive ? 'hover:bg-orange-500/10 hover:text-orange-500' : 'hover:bg-green-500/10 hover:text-green-500'}`}
+                                                    >
+                                                        {poll.isActive ? (
+                                                            <>
+                                                                <Pause className="h-4 w-4 mr-2" />
+                                                                Deactivate
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Play className="h-4 w-4 mr-2" />
+                                                                Activate
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </form>
+
+                                                {/* Delete */}
+                                                <form action={handleDeletePoll.bind(null, poll.id)}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        type="submit"
+                                                        className="w-full justify-start hover:bg-red-500/10 hover:text-red-500 text-red-600"
+                                                    >
+                                                        <Trash2 className="h-4 w-4 mr-2" />
+                                                        Delete
+                                                    </Button>
+                                                </form>
                                             </div>
                                         </PopoverContent>
                                     </Popover>
@@ -176,30 +269,77 @@ export default async function AdminPollsPage() {
                                         </PopoverTrigger>
                                         <PopoverContent className="w-40 p-2" align="end">
                                             <div className="space-y-1">
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-primary/10 hover:text-primary text-sm"
-                                                >
-                                                    <Eye className="h-3 w-3 mr-2" />
-                                                    View
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-secondary/10 hover:text-secondary text-sm"
-                                                >
-                                                    <Edit className="h-3 w-3 mr-2" />
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="sm"
-                                                    className="w-full justify-start hover:bg-red-500/10 hover:text-red-500 text-red-600 text-sm"
-                                                >
-                                                    <Trash2 className="h-3 w-3 mr-2" />
-                                                    Delete
-                                                </Button>
+                                                {/* View Details with Dialog */}
+                                                <Dialog>
+                                                    <DialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            className="w-full justify-start hover:bg-primary/10 hover:text-primary text-sm"
+                                                        >
+                                                            <Eye className="h-3 w-3 mr-2" />
+                                                            View Details
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <DialogContent className="max-w-md mx-4">
+                                                        <DialogHeader>
+                                                            <DialogTitle className="text-lg">Poll Details</DialogTitle>
+                                                        </DialogHeader>
+                                                        <div className="space-y-4">
+                                                            <div>
+                                                                <h3 className="font-semibold text-foreground mb-2">Question:</h3>
+                                                                <p className="text-foreground">{poll.question}</p>
+                                                            </div>
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Status:</h4>
+                                                                    <Badge variant={poll.isActive ? "default" : "outline"}>
+                                                                        {poll.isActive ? 'Active' : 'Closed'}
+                                                                    </Badge>
+                                                                </div>
+                                                                <div>
+                                                                    <h4 className="font-semibold text-foreground mb-1">Votes:</h4>
+                                                                    <p className="text-foreground">{poll.totalVotes}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </DialogContent>
+                                                </Dialog>
+
+                                                {/* Toggle Active/Inactive */}
+                                                <form action={handleTogglePollActive.bind(null, poll.id, poll.isActive)}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        type="submit"
+                                                        className={`w-full justify-start text-sm ${poll.isActive ? 'hover:bg-orange-500/10 hover:text-orange-500' : 'hover:bg-green-500/10 hover:text-green-500'}`}
+                                                    >
+                                                        {poll.isActive ? (
+                                                            <>
+                                                                <Pause className="h-3 w-3 mr-2" />
+                                                                Deactivate
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Play className="h-3 w-3 mr-2" />
+                                                                Activate
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </form>
+
+                                                {/* Delete */}
+                                                <form action={handleDeletePoll.bind(null, poll.id)}>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        type="submit"
+                                                        className="w-full justify-start hover:bg-red-500/10 hover:text-red-500 text-red-600 text-sm"
+                                                    >
+                                                        <Trash2 className="h-3 w-3 mr-2" />
+                                                        Delete
+                                                    </Button>
+                                                </form>
                                             </div>
                                         </PopoverContent>
                                     </Popover>
